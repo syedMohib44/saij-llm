@@ -1,6 +1,9 @@
 services:
   training:
-    image: syedmohib44/marketing-agent:v1
+    build: .                 # ✅ Forces local build
+    working_dir: /app
+    volumes:
+      - .:/app               # ✅ Mounts current folder into container
     command: python train.py
     deploy:
       resources:

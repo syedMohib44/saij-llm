@@ -1,18 +1,18 @@
-# Use a development image to allow on-the-fly kernel compilation for sm_120
-FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel-ubuntu22.04
+# Use NVIDIA's optimized Blackwell container (requires NGC account/login if private)
+# This image already contains CUDA 12.8 and Blackwell-compatible PyTorch
+FROM nvcr.io/nvidia/pytorch:25.01-py3
 
 WORKDIR /app
 
-# Install system dependencies including compilers
-RUN apt-get update && apt-get install -y git build-essential && rm -rf /var/lib/apt/lists/*
+# System dependencies
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-# Install requirements from the nightly index
+# Copy and install your Python requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Force bitsandbytes to use the CUDA 12.4 backend for Blackwell
-ENV BNB_CUDA_VERSION=124
-ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+# Ensure bitsandbytes is the latest for Blackwell support
+RUN pip install --upgrade bitsandbytes>=0.45.0
 
 COPY . .
 

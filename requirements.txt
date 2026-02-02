@@ -1,13 +1,12 @@
---index-url https://download.pytorch.org/whl/cu124
+# Use the nightly index for CUDA 12.8
+--index-url https://download.pytorch.org/whl/nightly/cu128
 --extra-index-url https://pypi.org/simple
-torch>=2.5.1
-torchvision>=0.20.1
-torchaudio>=2.5.1
+torch
+torchvision
+torchaudio
 transformers>=4.46.0
-fastapi
-uvicorn
-accelerate>=1.1.0
 bitsandbytes>=0.45.0
+accelerate
 peft
 trl
 datasets
