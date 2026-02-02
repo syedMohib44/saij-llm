@@ -1,15 +1,16 @@
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-runtime
+# Use a development image to allow on-the-fly kernel compilation for sm_120
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel-ubuntu22.04
 
 WORKDIR /app
 
-# Install git and build essentials for potential kernel compilation
+# Install system dependencies including compilers
 RUN apt-get update && apt-get install -y git build-essential && rm -rf /var/lib/apt/lists/*
 
-# Copy and install requirements
+# Install requirements from the nightly index
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Force bitsandbytes to use the correct CUDA library if it fails to auto-detect
+# Force bitsandbytes to use the CUDA 12.4 backend for Blackwell
 ENV BNB_CUDA_VERSION=124
 ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
