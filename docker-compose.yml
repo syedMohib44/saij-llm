@@ -1,0 +1,24 @@
+services:
+  training:
+    image: syedmohib44/marketing-agent:v1
+    command: python train.py
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+  
+  testing:
+    image: syedmohib44/marketing-agent:v1
+    command: python test.py
+    depends_on:
+      - training # Ensures testing only starts after training finishes successfully
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

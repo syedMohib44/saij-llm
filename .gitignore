@@ -205,3 +205,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+marketing_agent_deepseek_v1/
+marketing_agent_deepseek_v1_merged/
+marketing_agent_v1/
+vLLM/
