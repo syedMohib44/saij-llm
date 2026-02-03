@@ -14,10 +14,14 @@ services:
               capabilities: [gpu]
   
   testing:
-    image: syedmohib44/marketing-agent:v1
+    build: .                 # ✅ Use the local Blackwell-compatible Dockerfile
+    working_dir: /app        # ✅ Set the context for where python runs
+    volumes:
+      - .:/app               # ✅ Map your host files (including test.py) into the container
     command: python test.py
     depends_on:
-      - training # Ensures testing only starts after training finishes successfully
+      training:
+        condition: service_completed_successfully
     deploy:
       resources:
         reservations:

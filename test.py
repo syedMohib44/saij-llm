@@ -13,25 +13,26 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 MODEL_PATH = "./marketing_agent_deepseek_v1_merged"
 
-# 1. Load Tokenizer
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, fix_mistral_regex=True)
+# 1. Load Tokenizer - Removed fix_mistral_regex as it's now internal
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
 # 2. Optimized 4-bit Config
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
-    bnb_4bit_compute_dtype=torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16,
+    bnb_4bit_compute_dtype=torch.bfloat16, # Blackwell natively loves bf16
     bnb_4bit_quant_type="nf4",
     bnb_4bit_use_double_quant=True
 )
 
 # 3. Load Model
-print(f"Loading model onto GPU (RTX 3070)...")
+print(f"Loading model onto GPU (RTX PRO 6000 Blackwell)...")
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     quantization_config=bnb_config,
     device_map="auto",
     trust_remote_code=True,
-    attn_implementation="sdpa", 
+    # Using 'flash_attention_2' instead of 'sdpa' for Blackwell speed
+    attn_implementation="flash_attention_2", 
 )
 
 # 4. Query
@@ -50,10 +51,10 @@ with torch.no_grad():
     outputs = model.generate(
         **inputs,
         streamer=streamer,
-        max_new_tokens=512,
+        max_new_tokens=1024, # Increased for your 96GB VRAM
         temperature=0.6,
         top_p=0.95,
-        use_cache=True, # Critical for speed
+        use_cache=True,
         pad_token_id=tokenizer.eos_token_id,
     )
 end_time = time.time()
