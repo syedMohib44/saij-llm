@@ -1,9 +1,10 @@
 services:
   training:
-    build: .                 # ✅ Forces local build
+    build: .
     working_dir: /app
+    shm_size: '2gb'           # Prevents memory bus errors during training
     volumes:
-      - .:/app               # ✅ Mounts current folder into container
+      - .:/app
     command: python train.py
     deploy:
       resources:
@@ -12,16 +13,35 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-  
+
   testing:
-    build: .                 # ✅ Use the local Blackwell-compatible Dockerfile
-    working_dir: /app        # ✅ Set the context for where python runs
+    build: .
+    working_dir: /app
+    shm_size: '2gb'
     volumes:
-      - .:/app               # ✅ Map your host files (including test.py) into the container
+      - .:/app
     command: python test.py
     depends_on:
       training:
         condition: service_completed_successfully
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  api:
+    build: .
+    working_dir: /app
+    shm_size: '2gb'
+    ports:
+      - "0.0.0.0:8000:8000"   # Maps MojoHost IP Port 8000 to Container Port 8000
+    volumes:
+      - .:/app
+    command: python main.py
+    restart: unless-stopped  # Auto-restarts if the app crashes or server reboots
     deploy:
       resources:
         reservations:
