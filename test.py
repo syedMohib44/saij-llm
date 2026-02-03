@@ -26,13 +26,13 @@ bnb_config = BitsAndBytesConfig(
 
 # 3. Load Model
 print(f"Loading model onto GPU (RTX PRO 6000 Blackwell)...")
+# Change from "flash_attention_2" to "sdpa"
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     quantization_config=bnb_config,
     device_map="auto",
     trust_remote_code=True,
-    # Using 'flash_attention_2' instead of 'sdpa' for Blackwell speed
-    attn_implementation="flash_attention_2", 
+    attn_implementation="sdpa", # ✅ Use native PyTorch optimization
 )
 
 # 4. Query
