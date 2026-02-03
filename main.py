@@ -12,7 +12,7 @@ app = FastAPI(title="Marketing Agent API")
 MODEL_PATH = "./marketing_agent_deepseek_v1_merged"
 
 # Load Tokenizer
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, fix_mistral_regex=True)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
 # Optimized 4-bit config for MojoHost (saves VRAM for concurrent requests)
 bnb_config = BitsAndBytesConfig(
